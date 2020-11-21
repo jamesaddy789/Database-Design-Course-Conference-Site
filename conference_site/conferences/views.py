@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.db import IntegrityError
 from .forms import AttendeeRegistrationForm, ConferenceCheckoutForm
 from .models import Attendee, Conference, Session, Materials, Purchased_Conference
 from datetime import date, datetime
@@ -49,21 +50,25 @@ def register(request):
             company_institution = form.cleaned_data['company_institution']
             title = form.cleaned_data['title']
             is_student = form.cleaned_data['is_student']
+            try:
+                user = User.objects.create(
+                    username=username, email=email, first_name=first_name, last_name=last_name)
+                user.set_password(raw_password=password)
+                user.save()
+                user.refresh_from_db()
 
-            user = User.objects.create(
-                username=username, email=email, first_name=first_name, last_name=last_name)
-            user.set_password(raw_password=password)
-            user.save()
-            user.refresh_from_db()
-
-            attendee = Attendee.objects.create(user=user, address=address, phone=phone,
+                attendee = Attendee.objects.create(user=user, address=address, phone=phone,
                                                company_institution=company_institution, title=title, is_student=is_student)
-            attendee.save()
-
-            messages.success(
-                request, 'You have successfully registered! Log in with the link below.')
+                attendee.save()
+                login(request, user)
+                return redirect(confirm_registration)
+            except IntegrityError as e:
+                messages.error(request, 'Error: ' + e)
+            
     return render(request, template_name='conferences/register.html', context={'form': form})
 
+def confirm_registration(request):
+    return render(request, template_name='conferences/registration_confirmation.html', context={'username': request.user.username})
 
 @login_required
 def home(request):

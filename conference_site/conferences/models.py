@@ -16,7 +16,7 @@ class Attendee(models.Model):
     is_student = models.BooleanField()
 
     def __str__(self):
-        return self.user.get_full_name()
+        return self.user.username
 
 class Conference(models.Model):
     name = models.CharField(max_length=200, default="Conference")
@@ -24,18 +24,19 @@ class Conference(models.Model):
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount_deadline = models.DateField(default=date.today)
 
+    def get_conference_name_with_id(self):
+        return self.name + ' (ID:' + str(self.id) + ')'
+
     def __str__(self):
-        return self.name
+        return self.get_conference_name_with_id()
 
 class Conference_Date_Time(models.Model):
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
     start_date_time = models.DateTimeField(default=datetime.now())
     end_date_time = models.DateTimeField(default=datetime.now())
-    def __str__(self):
-        return self.conference.name + ' Date/Time'
-    class Meta:
-        verbose_name = 'Conference Date Time'
 
+    def __str__(self):
+        return self.conference.get_conference_name_with_id() + ' Date/Time'
 
 class Session(models.Model):
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
@@ -50,9 +51,11 @@ class Session(models.Model):
         max_length=max_string_length, choices=TYPES, default=TECHNICAL)
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=10)
 
-    def __str__(self):
-        return self.title
+    def get_session_name_with_id(self):
+        return self.title + ' (ID:' + str(self.pk) + ')'
 
+    def __str__(self):
+        return self.get_session_name_with_id()
 
 class Materials(models.Model):
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
@@ -64,6 +67,9 @@ class Materials(models.Model):
         max_length=max_string_length, choices=TYPES, default=BANQUET_TICKETS)
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=5)
 
+    def __str__(self):
+        return self.conference.get_conference_name_with_id() + self.material_type
+
     class Meta:
         verbose_name_plural = "Materials"
 
@@ -71,6 +77,10 @@ class Materials(models.Model):
 class Speaks(models.Model):
     attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.attendee.user.username + " speaks for " + self.session.get_session_name_with_id()
+
     class Meta:
         verbose_name_plural = "Speaks"
 
@@ -90,3 +100,9 @@ class Purchased_Conference(models.Model):
     PAYMENT_TYPES = [(CREDIT_CARD, CREDIT_CARD), (CASH, CASH), (CHECK, CHECK)]
     payment_type = models.CharField(max_length=max_string_length, choices=PAYMENT_TYPES, default=CREDIT_CARD)
     transaction_date_time = models.DateTimeField(default=datetime.now())
+
+    def __str__(self):
+        return self.attendee.user.username + " purchased " + self.conference.get_conference_name_with_id()
+
+    class Meta:
+        verbose_name_plural = "Purchased Conferences"

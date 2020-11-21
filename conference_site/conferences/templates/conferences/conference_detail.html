@@ -10,7 +10,7 @@
             <H2>Dates and Times</H2>
             {% for datetime in conference.conference_date_time_set.all %}
                 <p>
-                    from {{datetime.start_date_time | date:'M d, Y h:i a'}} to {{datetime.end_date_time | date:'M d, Y h:i a'}}
+                    From {{datetime.start_date_time | date:'M d, Y h:i a'}} to {{datetime.end_date_time | date:'M d, Y h:i a'}}
                 </p>
             {% endfor %}
             <H2>Discount</H2>

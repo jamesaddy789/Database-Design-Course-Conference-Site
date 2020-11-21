@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Conference, Session, Materials, Conference_Date_Time, Speaks
+from django.contrib.auth.models import User
+from .models import Conference, Session, Materials, Conference_Date_Time, Speaks, Attendee, Purchased_Conference
 
 class Session_Inline(admin.StackedInline):
     extra = 0
@@ -25,3 +26,5 @@ class Conference_Admin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Conference, Conference_Admin)
 admin.site.register(Speaks)
+admin.site.register(Attendee)
+admin.site.register(Purchased_Conference)
