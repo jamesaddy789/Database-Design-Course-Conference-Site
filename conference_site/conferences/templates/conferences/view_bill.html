@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html>
-    <h1>Current Bill</h1>
-    {% if purchase_info_list %}
-    <ul>
-        {% for purchase_info in purchase_info_list %}
-        <li>
-             {{ purchase_info }}
-        </li>
-        <br>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>There are currently no purchases on this account.</p>
-    {% endif %}
+    <div>
+        <h1>Current Bill</h1>
+        {% if purchase_info_list %}
+            {% for purchase_info in purchase_info_list %}
+            <H3>{{ purchase_info.conference_name }}</H3>
+            <p>
+                Technical Session Cost: ${{ purchase_info.technical_session_cost }}
+                <br>
+                Tutorial Session Cost: ${{ purchase_info.tutorial_session_cost }}
+                <br>
+                Workshop Session Cost: ${{ purchase_info.workshop_session_cost }}
+                <br>
+                {{ purchase_info.proceedings_amt }} Proceedings for: ${{ purchase_info.proceedings_cost }}
+                <br>
+                {{ purchase_info.banquet_tickets_amt }} Banquet Tickets for: ${{ purchase_info.banquet_tickets_cost }}
+                <br>
+                Original Price: ${{ purchase_info.total }}
+                <br>
+                Discount: {{ purchase_info.discount_percent }}%
+                <br>
+                Discount Price: ${{ purchase_info.discount_price }}
+                <br>
+                Purchase Date: {{ purchase_info.purchased_date_time | date:'M d, Y h:i a' }}
+                <br>
+                Payment Type: {{ purchase_info.payment_type }}
+            </p>
+            <br>
+            {% endfor %}
+            <strong>Grand Total: ${{ grand_total }}</strong>
+        {% else %}
+            <p>There are currently no purchases on this account.</p>
+        {% endif %}       
+    </div>  
 </html>

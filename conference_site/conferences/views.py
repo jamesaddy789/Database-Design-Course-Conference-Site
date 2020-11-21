@@ -87,7 +87,7 @@ def browse_conferences(request):
 
 def conference_detail(request, pk):
     conference = get_object_or_404(Conference, pk=pk) 
-    discount_percent = conference.discount * 100
+    discount_percent = int(conference.discount * 100)
     all_technical_sessions = Session.objects.filter(
         session_type=Session.TECHNICAL)
     technical_session = all_technical_sessions.get(conference=conference)
@@ -103,12 +103,13 @@ def conference_detail(request, pk):
     return render(request, template_name='conferences/conference_detail.html',  context=context)
 
 def get_discount_price(conference, attendee, original_price):
-    discount_price = original_price
+    discount = 0
     #Calculate discounts. Students get a 5% discount
     if date.today() < conference.discount_deadline:
-        discount_price *= (1 - conference.discount)
+        discount = conference.discount
     if attendee.is_student:
-        discount_price *= Decimal(.95) 
+        discount += Decimal(.05) 
+    discount_price = original_price * (1 - discount)
     discount_price = round(discount_price, 2)
     return discount_price
 
@@ -137,15 +138,16 @@ def conference_checkout(request, pk, current_price):
                 print("Purchase already exists")
             purchased_conference.proceedings_amt = form.cleaned_data['proceedings_amt']
             purchased_conference.banquet_tickets_amt = form.cleaned_data['banquet_tickets_amt']
-            purchased_conference.is_tutorial_selected = form.cleaned_data['is_tutorial_selected']
-            purchased_conference.is_workshop_selected = form.cleaned_data['is_workshop_selected']
+            purchased_conference.is_tutorial_purchased = form.cleaned_data['is_tutorial_selected']
+            purchased_conference.is_workshop_purchased = form.cleaned_data['is_workshop_selected']
             purchased_conference.payment_type = form.cleaned_data['payment_type']
             purchased_conference.transaction_date_time = datetime.now()
+            print("Transaction time = " + purchased_conference.transaction_date_time.strftime('%Y-%m-%d %H:%M'))
             purchased_conference.save()
             
-            if purchased_conference.is_tutorial_selected:
+            if purchased_conference.is_tutorial_purchased:
                 current_price += tutorial_session.cost
-            if purchased_conference.is_workshop_selected:
+            if purchased_conference.is_workshop_purchased:
                 current_price += workshop_session.cost
             current_price += (proceedings.cost * purchased_conference.proceedings_amt) + (banquet_tickets.cost * purchased_conference.banquet_tickets_amt)
             print("Purchased Data Saved")
@@ -158,5 +160,62 @@ def checkout_confirmation(request, pk, price):
     conference = Conference.objects.get(pk=pk)
     return render(request, template_name='conferences/checkout_confirmation.html', context={'conference': conference, 'price': price})
 
+class Purchase_Info():
+    conference_name = ''
+    technical_session_cost = 0
+    tutorial_session_cost = 0
+    workshop_session_cost = 0
+    proceedings_amt = 0
+    proceedings_cost = 0
+    banquet_tickets_amt = 1
+    banquet_tickets_cost = 0
+    student_discount = 0
+    conference_discount = 0
+    discount_percent = 0
+    total = 0
+    discount_price = 0
+    purchased_date_time = None
+    payment_type = None
+
+    def __init__(self, purchased_conference):
+        #Collect necessary data from database
+        conference = purchased_conference.conference
+        sessions = Session.objects.filter(conference=conference)
+        materials = Materials.objects.filter(conference=conference)
+        proceedings = materials.get(material_type=Materials.PROCEEDINGS)
+        banquet_tickets = materials.get(material_type=Materials.BANQUET_TICKETS)
+        #Populate the fields
+        self.conference_name = conference.name
+        self.technical_session_cost = sessions.get(session_type=Session.TECHNICAL).cost
+
+        if purchased_conference.is_tutorial_purchased:
+            self.tutorial_session_cost = sessions.get(session_type=Session.TUTORIAL).cost
+        if purchased_conference.is_workshop_purchased:
+            self.workshop_session_cost = sessions.get(session_type=Session.WORKSHOP).cost
+
+        self.proceedings_amt = purchased_conference.proceedings_amt
+        self.proceedings_cost = proceedings.cost * self.proceedings_amt
+        self.banquet_tickets_amt += purchased_conference.banquet_tickets_amt
+        self.banquet_tickets_cost = banquet_tickets.cost * self.banquet_tickets_amt
+
+        if purchased_conference.attendee.is_student:
+            self.student_discount = Decimal(.05)
+        if purchased_conference.transaction_date_time.date() < conference.discount_deadline:
+            self.conference_discount = conference.discount
+
+        self.discount_percent = int((self.student_discount + self.conference_discount) * 100)
+        self.total = self.technical_session_cost + self.tutorial_session_cost + self.workshop_session_cost + self.proceedings_cost + self.banquet_tickets_cost
+        self.discount_price = get_discount_price(conference, purchased_conference.attendee, self.total)
+        self.purchased_date_time = purchased_conference.transaction_date_time
+        self.payment_type = purchased_conference.payment_type
+        
 def view_bill(request):
-    return render(request, template_name='conferences/view_bill.html')
+    all_purchases = Purchased_Conference.objects.filter(attendee=request.user.attendee)
+    purchase_info_list = []
+    grand_total = 0
+    for purchase in all_purchases:
+        purchase_info = Purchase_Info(purchase)
+        purchase_info_list.append(purchase_info)
+        grand_total += purchase_info.discount_price
+    context = {'purchase_info_list': purchase_info_list, 'grand_total': grand_total}
+    return render(request, template_name='conferences/view_bill.html', context=context)
