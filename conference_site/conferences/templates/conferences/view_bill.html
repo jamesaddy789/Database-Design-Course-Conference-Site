@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <h1>Current Bill</h1>
+    {% if purchase_info_list %}
+    <ul>
+        {% for purchase_info in purchase_info_list %}
+        <li>
+             {{ purchase_info }}
+        </li>
+        <br>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>There are currently no purchases on this account.</p>
+    {% endif %}
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <title>Conferences Homepage</title>
+        <div align=center>
+            <p>
+                <strong>You are currently logged in as {{username}}. </strong>
+                <a href="{% url 'logout' %}"><strong>Log Out</strong></a>
+            </p>
+            <h1>Conferences Homepage</h1>
+            <a href="{% url 'browse_conferences' %}"><strong>Browse available conferences</strong></a>
+            <br>
+            <br>
+            <a href="{% url 'view_bill' %}"><strong>View current bill</strong></a>
+            <br>          
+        </div>
+    </body>
+</html>

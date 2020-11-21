@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <div>
+        <h1>Conference List</h1>
+        {% if conference_list %}
+        <ul>
+            {% for conference in conference_list %}
+            <li>
+                <a href="{% url 'conference_detail' conference.pk %}">{{ conference.name }}</a>
+            </li>
+            <br>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>There are currently no conferences available.</p>
+        {% endif %}
+    </div>
+</html>

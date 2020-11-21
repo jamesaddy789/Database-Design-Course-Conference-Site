@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+        <body>
+            <div>
+                <H1>{{conference.name}} Checkout</H1>
+                <h2>Additional Items</h2>
+                <h3>Current price is ${{current_price}}</h3>
+                <form method="POST">
+                    {%csrf_token%}
+                    {{ form.as_p }}
+                    <button type="submit" name="confirm_checkout" value="confirm_checkout"><strong>Confirm Checkout</strong></button> 
+                </form>              
+            </div>                
+        </body>     
+</html>

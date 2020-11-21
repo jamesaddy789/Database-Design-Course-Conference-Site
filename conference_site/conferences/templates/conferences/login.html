@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<Head>
+    <title>Conferences Login</title>
+</Head>
+
+<body>
+    <div align=center>
+        <div>
+            <h1>Conferences Login</h1>
+            <form method="POST">
+                {%csrf_token%}
+                {{ form.as_p }}
+                <button type="submit">Log in</button>
+            </form>
+        </div>
+        <br>
+        <div>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <br>
+        <div>
+            <p>Not yet registered? Register <a href="{% url 'register' %}"><strong>HERE</strong></a></p>
+        </div>
+    </div>
+</body>
+
+</html>
