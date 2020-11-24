@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+        <body>
+            <div align = center>
+                <H1>Are you sure you want to remove your {{ purchase_name }} purchase?</H1>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="yes" value="yes"><strong>Yes</strong></button>
+                    <button type="submit" name="no" value="no"><strong>No</strong></button>
+                </form>    
+            </div>
+            </div>            
+        </body>     
+</html>

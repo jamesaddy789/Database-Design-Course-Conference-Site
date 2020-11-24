@@ -12,4 +12,6 @@ urlpatterns = [
     path('conference_checkout=<int:pk>=<str:current_price>', views.conference_checkout, name='conference_checkout'),
     path('view_bill', views.view_bill, name='view_bill'),
     path('checkout_confirmation=<int:pk>=<str:price>', views.checkout_confirmation, name='checkout_confirmation'),
+    path('remove_purchase=<int:pk>', views.remove_purchase, name='remove_purchase'),
+    path('remove_purchase_confirmation=<str:purchase_name>', views.remove_purchase_confirmation, name='remove_purchase_confirmation'),
 ]
