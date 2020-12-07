@@ -1,0 +1,30 @@
+<!DOCTYPE html> 
+<html>
+<Head>
+    <title>Account Information</title>
+</Head> 
+
+<body>
+    <div align = center>
+        <div>
+            <h1>Account Information</h1>
+            <div>
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Address:</strong> {{ user.attendee.address }}</p>
+                <p><strong>Phone:</strong> {{ user.attendee.phone }}</p>
+                <p><strong>Company/Institution:</strong> {{ user.attendee.company_institution }}</p>
+                <p><strong>Tile:</strong> {{ user.attendee.title }}</p>
+                <p><strong>Are you a student?:</strong> {{ is_student }}</p>
+            </div>
+            <form method="POST">
+                {%csrf_token%}
+                <button type="submit" name ="submit">Change Account Info</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

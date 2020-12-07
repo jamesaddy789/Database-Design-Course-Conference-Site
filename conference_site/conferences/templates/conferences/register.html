@@ -10,7 +10,8 @@
             <h1>Conferences Registration</h1>
             <form method="POST">
                 {%csrf_token%}
-                {{ form.as_p }}
+                {{ user_form.as_p }}
+                {{ attendee_form.as_p }}
                 <button type="submit" name ="submit">Register</button>
             </form>
         </div>

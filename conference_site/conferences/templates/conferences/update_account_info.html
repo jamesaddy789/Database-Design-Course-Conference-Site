@@ -1,0 +1,25 @@
+<!DOCTYPE html> 
+<html>
+<Head>
+    <title>Account Information</title>
+</Head> 
+
+<body>
+    <div align = center>
+        <div>
+            <h1>Update Account Information</h1>
+            <form method="POST">
+                {%csrf_token%}
+                {{ user_form.as_p }}
+                {{ attendee_form.as_p }}
+                <button type="submit" name ="submit">Save Changes</button>
+            </form>
+        </div>
+        <br>
+        <div>
+            <a href="{% url 'change_password' %}"><strong>Change Password</strong></a>
+        </div>
+    </div>
+</body>
+
+</html>
